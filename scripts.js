@@ -400,8 +400,17 @@ async function checkIfLegit(token) {
       }
 
       const data = await response.json();
+      if (data[0].onChainAccountInfo.accountInfo.data.parsed.info.supply > 1) {
+        output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
+        output.classList.add("fake")
+        output.classList.add("shown")
+        output.classList.remove("hidden")
+        output.classList.remove("legit")
 
-      if (data[0].onChainMetadata.metadata === null) {
+        discordInvite.classList.remove("hidden")
+        discordInvite.classList.add("shown")
+      }
+      else if (data[0].onChainMetadata.metadata === null) {
         output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
         output.classList.add("fake")
         output.classList.add("shown")
