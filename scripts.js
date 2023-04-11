@@ -400,29 +400,41 @@ async function checkIfLegit(token) {
       }
 
       const data = await response.json();
-      for (oneMint of data) {
-        const creatorAddress = oneMint.onChainMetadata.metadata.data.creators[0].address
-        const verifiedCreator = oneMint.onChainMetadata.metadata.data.creators[0].verified
 
-        // creator check
-        if (creatorAddress === checkCreatorAddress && verifiedCreator === true) {
-          output.textContent = "This is a real Saga Pass"
-          output.classList.add("legit")
-          output.classList.add("shown")
-          output.classList.remove("hidden")
-          output.classList.remove("fake")
+      if (data[0].onChainMetadata.metadata === null) {
+        output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
+        output.classList.add("fake")
+        output.classList.add("shown")
+        output.classList.remove("hidden")
+        output.classList.remove("legit")
 
-          discordInvite.classList.remove("shown")
-          discordInvite.classList.add("hidden")
-        } else {
-          output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
-          output.classList.add("fake")
-          output.classList.add("shown")
-          output.classList.remove("hidden")
-          output.classList.remove("legit")
-
-          discordInvite.classList.remove("hidden")
-          discordInvite.classList.add("shown")
+        discordInvite.classList.remove("hidden")
+        discordInvite.classList.add("shown")
+      } else {
+        for (oneMint of data) {
+          const creatorAddress = oneMint.onChainMetadata.metadata.data.creators[0].address
+          const verifiedCreator = oneMint.onChainMetadata.metadata.data.creators[0].verified
+  
+          // creator check
+          if (creatorAddress === checkCreatorAddress && verifiedCreator === true) {
+            output.textContent = "This is a real Saga Pass"
+            output.classList.add("legit")
+            output.classList.add("shown")
+            output.classList.remove("hidden")
+            output.classList.remove("fake")
+  
+            discordInvite.classList.remove("shown")
+            discordInvite.classList.add("hidden")
+          } else {
+            output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
+            output.classList.add("fake")
+            output.classList.add("shown")
+            output.classList.remove("hidden")
+            output.classList.remove("legit")
+  
+            discordInvite.classList.remove("hidden")
+            discordInvite.classList.add("shown")
+          }
         }
       }
     } catch (error) {
