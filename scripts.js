@@ -311,7 +311,7 @@ async function fetchWalletData() {
   try {
     const response = await fetch(`https://rpc-proxy.de7215.workers.dev/v0/addresses/${publicKey}/balances`);
     const data = await response.json();
-    const tokens = data.tokens.filter((token) => token.amount > 0);
+    const tokens = data.tokens.filter((token) => token.amount > 0 && token.amount <= 1);
     
     highlightCards(tokens);
     
@@ -329,6 +329,7 @@ async function fetchWalletData() {
     
     // Display the best combinations on the page
     displayBestCombinations(bestCombinations);
+
   } catch (error) {
     console.error("Error fetching wallet data:", error);
     alert("An error occurred while fetching wallet data. Please try again.");
@@ -359,3 +360,80 @@ function clearAllHighlights() {
   }
 }
 
+let mintArray = [];
+
+const inputPass = document.getElementById('passAddress')
+inputPass.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    checkIfLegit(event.target.value)
+    console.log(event.target.value)
+  }
+})
+
+const output = document.getElementById("output")
+const discordInvite = document.getElementById("discord")
+
+async function checkIfLegit(token) {
+  mintArray = [];
+  mintArray.push(token)
+  const url = "https://api.helius.xyz/v0/token-metadata?api-key=c31bcee9-bae5-4ce0-84ef-c8cf03452996"
+  const nftAddresses = mintArray
+  const checkCreatorAddress = "sgfeUpN2FGxV1qfgRF1aYpRgYGk9LCRPtnZKJPJEccW"
+
+  const getMetadata = async () => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mintAccounts: nftAddresses,
+          includeOffChain: true,
+          disableCache: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      for (oneMint of data) {
+        const creatorAddress = oneMint.onChainMetadata.metadata.data.creators[0].address
+        const verifiedCreator = oneMint.onChainMetadata.metadata.data.creators[0].verified
+
+        // creator check
+        if (creatorAddress === checkCreatorAddress && verifiedCreator === true) {
+          output.textContent = "This is a real Saga Pass"
+          output.classList.add("legit")
+          output.classList.add("shown")
+          output.classList.remove("hidden")
+          output.classList.remove("fake")
+
+          discordInvite.classList.remove("shown")
+          discordInvite.classList.add("hidden")
+        } else {
+          output.textContent = "This is a fake Saga Pass. Contact us for more info and before burning."
+          output.classList.add("fake")
+          output.classList.add("shown")
+          output.classList.remove("hidden")
+          output.classList.remove("legit")
+
+          discordInvite.classList.remove("hidden")
+          discordInvite.classList.add("shown")
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+      alert("An error occurred while fetching metadata. Please try again.");
+    }
+  }
+
+  async function checkIfValid() {
+    await getMetadata()
+  }
+
+  checkIfValid()
+}

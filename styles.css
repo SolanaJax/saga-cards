@@ -191,3 +191,26 @@ tr:not(:last-child) {
   border-bottom: 1px solid #145fcf;
 }
 
+#passChecker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.shown {
+  display: inline-block;
+}
+
+.legit {
+  color: green
+}
+
+.fake {
+  color: red
+}
